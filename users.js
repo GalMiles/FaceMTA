@@ -1,10 +1,16 @@
-const utills = require("./utills")
+//const utills = require("./utills")
 const express = require('express');
 const StatusCodes = require('http-status-codes').StatusCodes;
 const package = require('./package.json');
-const bcrypt = require("bcrypt");
+//const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const validator = require("email-validator");
+const md5 = require('md5');
+
 let port =3000
 const app = express()
+
+
 
 // General app settings
 const set_content_type = function (req, res, next) 
@@ -22,7 +28,6 @@ app.use(express.urlencoded( // to support URL-encoded bodies
 
 
 
-
 // User's table
 const g_users = [ {id:1, full_name: 'Root'} ];
 // API functions
@@ -36,7 +41,7 @@ function get_version( req, res)
 
 function list_users( req, res) 
 {
-	res.send(  JSON.stringify( g_users) );   
+	res.send(  JSON.stringify( g_users) );   //make js object to string
 }
 
 function get_user( req, res )
@@ -110,31 +115,11 @@ function create_user( req, res )
 	}
 
 	//check if email field is not empty or if valid email or if already in use
-	if (email)
-	{
-		  const validateEmail = utills.EmailValidation(email) 
-		  if (!validateEmail)
-		  {
-			res.status( StatusCodes.BAD_REQUEST );
-			res.send( "The email is not valid in request")
-			return;
-		  }
-		  else
-		  {
-			if(g_users.find(item.email==email))
-			{
-				res.status( StatusCodes.BAD_REQUEST );
-				res.send( "This E-mail is already in use")
-				return;
-			}
-		  }
-	}
-	else
-	{
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Missing email in request")
+	if(!is_email_valid(email,req, res) || !is_email_exist(email, g_users, req, res))
 		return;
-	}
+	
+	if(!check_password(password, req, res))
+		return;
 
 	// Find max id  & create unique ID
 	let max_id = 0;
@@ -142,30 +127,21 @@ function create_user( req, res )
 		item => { max_id = Math.max( max_id, item.id) }
 	)
 	const new_id = max_id + 1;
-
-	//create new user object and hash the password
-	bcrypt.hash(req.body.password, 10, (err, hash) => {
-		if (err) {
-			res.status( StatusCodes.INTERNAL_SERVER_ERROR );
-			res.send(err);
-			return;
-		} 
-		else {
-			const new_user = { 
-				id: new_id , 
-				full_name: full_name,
-				email: email,
-				password: hash,
-				creation_date: creation_date,
-				status: "created"
-			};
-		}
-	})
-
+	
+	//hash password
+	// const hash = crypto.createHash('sha256').update(password);
+	const hash = md5(password);
+	const new_user = { 
+		id: new_id , 
+		full_name: full_name,
+		email: email,
+		password: hash,
+		creation_date: creation_date,
+		status: "created"
+	};
 	g_users.push(new_user);
 	res.send(JSON.stringify(new_user));   
 }
-
 
 //--------UPDATE USER------
 //user can update his details such as email, password and full name 
@@ -176,7 +152,8 @@ function update_user( req, res )
 	const name = req.body.full_name;
 	const status = req.body.status;
 	const email = req.body.email;
-
+	let password = req.body.password;
+ 
 	//not valid id
 	if ( id <= 0)
 	{
@@ -186,8 +163,8 @@ function update_user( req, res )
 	}
 
 	//there is no such a user with this id
-	const idx =  g_users.findIndex( user =>  user.id == id )
-	if ( idx < 0 )
+	const user =  g_users.find( item =>  item.id == id )
+	if ( !user )
 	{
 		res.status( StatusCodes.NOT_FOUND );
 		res.send( "No such user")
@@ -202,56 +179,103 @@ function update_user( req, res )
 		return;
 	}
 
-	if (email)
+	//checking email validation
+	if(!is_email_valid(email, req, res))
+		return;
+		
+	const index = g_users.findIndex(element => element.email==email);
+
+	//there is somone with that email
+	if(index >= 0)
 	{
-		  const validateEmail = utills.EmailValidation(email) 
-		  if (!validateEmail)
-		  {
+		if(!(g_users[index].id == id))                            //check if its the cuurent user or not
+		{
 			res.status( StatusCodes.BAD_REQUEST );
-			res.send( "The email is not valid in request")
+			res.send( "This E-mail is already in use")
 			return;
-		  }
-		  else
-		  {
-			if(g_users.find(item.email==email))
-			{
-				res.status( StatusCodes.BAD_REQUEST );
-				res.send( "This E-mail is already in use")
-				return;
-			}
-		  }
+		}                                
+		
 	}
 
-	//if the loged-in user is the admin
-	if (req.tokenData.email === process.env.ADMIN) 
-	{
-		const user = g_users[idx];
-		user.status = status;
-	} 
-	else {
-		if (g_users[idx].status != status)
-		{
-			res.status( StatusCodes.UNAUTHORIZED);
-			res.send( "UNAUTHORIZED user request")
-			return;
-		}
-		bcrypt.hash(req.body.password, 10, (err, hash) => {
-			if (err) {
-				res.status( StatusCodes.INTERNAL_SERVER_ERROR );
-				res.send(err);
-				return;
-			} 
-			else {
-				const user = g_users[idx];
-				user.full_name = name;
-				user.email = email;
-				user.password=hash
-			}
-		})
-	} 
+	// if(!check_password(password, req, res))
+	// 	return;
+
+	//const hash = md5(password);
+	user.full_name = name;
+	user.email = email;
+	//user.password = hash;
+
+	// //if the loged-in user is the admin
+	// if (req.tokenData.email === process.env.ADMIN) 
+	// {
+	// 	const user = g_users[idx];
+	// 	user.status = status;
+	// } 
+	// else {
+	// 	if (g_users[idx].status != status)
+	// 	{
+	// 		res.status( StatusCodes.UNAUTHORIZED);
+	// 		res.send( "UNAUTHORIZED user request")
+	// 		return;
+	// 	}
+	// 	bcrypt.hash(req.body.password, 10, (err, hash) => {
+	// 		if (err) {
+	// 			res.status( StatusCodes.INTERNAL_SERVER_ERROR );
+	// 			res.send(err);
+	// 			return;
+	// 		} 
+	// 		else {
+	// 			const user = g_users[idx];
+	// 			user.full_name = name;
+	// 			user.email = email;
+	// 			user.password=hash
+	// 		}
+	// 	})
+	// } 
 	res.send(  JSON.stringify( {user}) );  
 }
 
+function is_email_valid(email, req, res)
+{
+	if(email)
+	{
+		if(!validator.validate(email))
+		{
+			res.status( StatusCodes.BAD_REQUEST );
+			res.send( "The email is not valid in request")
+			return false;
+		}
+	}
+	else
+	{
+		res.status( StatusCodes.BAD_REQUEST );
+		res.send( "Missing email in request")
+		return false;
+	}
+	return true;
+}
+function is_email_exist(email, g_users, req, res)
+{
+	const email_found = g_users.find(element => element.email==email);
+	if(email_found)
+		{
+			res.status( StatusCodes.BAD_REQUEST );
+			res.send( "This E-mail is already in use")
+				return false;
+		}
+	return true;
+}
+
+function check_password(password,req, res)
+{
+	if(!password || !password.trim())
+	{
+		res.status( StatusCodes.INTERNAL_SERVER_ERROR );
+		res.send("Missing password in request");
+		return false;
+	}
+	return true;
+}
 // Routing
 const router = express.Router();
 router.get('/version', (req, res) => { get_version(req, res )  } );
