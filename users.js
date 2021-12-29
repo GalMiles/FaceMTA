@@ -7,13 +7,14 @@ const crypto = require('crypto');
 const validator = require("email-validator");
 const md5 = require('md5');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
+const fs = require('fs').promises;
 const util = require('util');
-
-
+const FILE_PATH = './users.json';
 const token_secret = crypto.randomBytes(64).toString('hex');
-const readFile = util.promisify(fs.readFile);
-
+//const readFile = util.promisify(fs.readFile);
+const hash = md5('sudo');
+// User's table
+const g_users = [];
 let port =3000
 const app = express()
 
@@ -31,11 +32,9 @@ app.use(express.urlencoded( // to support URL-encoded bodies
   extended: true
 }));
 
-
-
-// User's table
-const hash = md5('sudo');
-const g_users = [ {id:1, full_name: 'Root', email: 'root@gmail.com', password: hash, status: 'active'} ];
+creata_admin();
+//load_users();
+//console.log("finish");
 // API functions
 
 // Version 
@@ -161,6 +160,7 @@ function create_user( req, res )
 	};
 	g_users.push(new_user);
 	res.send(JSON.stringify(new_user));   
+	save_users();
 }
 
 //--------UPDATE USER------
@@ -430,6 +430,7 @@ function logout(req, res)
 	res.send( "You logged out");
 }
 
+//functions
 function is_email_valid(email, req, res)
 {
 	if(email)
@@ -522,6 +523,78 @@ function get_id_from_token(req, res)
 
 }
 
+
+function load_users()
+{
+	load_file(FILE_PATH).then((data) => {
+		console.log(data);
+		const users = JSON.parse(data);
+		g_users.length = 0;
+		users.forEach (elemnt => {
+			g_users.push(elemnt);
+		});
+	});
+}
+
+//load file to system
+async function load_file(file_path)
+{
+	if(! await is_file_exist(file_path))
+	{
+		save_data(file_path, JSON.stringify([]));
+	}
+	const data = await fs.readFile(file_path);
+	return data;
+}
+
+// const data = await fs.readFile(file_path,  (err, data) => {
+// 	if(err){
+// 		console.log(err);
+// 		return;
+// 	}
+// 	console.log(data)})
+
+function creata_admin()
+{
+	const admin = {
+		id:1, 
+		full_name: 'Root', 
+		email: 'root@gmail.com', 
+		password: hash, 
+		status: 'active'};
+
+	g_users.push(admin);
+}
+// function save_users()
+// {
+// 	save_data('./try.txt', JSON.stringify(g_users)).catch(err=> console.log(err));
+// }
+function save_users()
+{
+	save_data(FILE_PATH, JSON.stringify(g_users)).catch(err=> console.log(err));
+}
+
+//save data to file
+async function save_data(file_path, data)
+{
+	await fs.writeFile(file_path, data)
+}
+
+
+//check if file doesn't exist do not load
+async function is_file_exist(file_path)
+{
+	try{
+		const file_details = await fs.stat(file_path, (err) => {
+			if(err)
+				console.log(err);});
+		return true;
+	}
+	catch(e){
+		return false;
+	}
+}
+
 // Routing
 const router = express.Router();
 router.get('/version', (req, res) => { get_version(req, res )  } );
@@ -531,13 +604,10 @@ router.put('/user/(:id)', (req, res) => { update_user(req, res )  } )
 router.get('/user/(:id)', (req, res) => { get_user(req, res )  })
 router.delete('/user/(:id)', (req, res) => { delete_user(req, res )  })
 router.post('/user/login', (req, res) => { login(req, res )  })
-
 router.put('/user/approve/(:id)', (req, res) => { approve_user(req, res )  })
 router.put('/user/suspend/(:id)', (req, res) => { suspend_user(req, res )  })
 router.put('/user/restore/(:id)', (req, res) => { restore_user(req, res )  })
 router.post('/user/logout', (req, res) => { logout(req, res )  })
-
-
 
 app.use('/api',router)
 
