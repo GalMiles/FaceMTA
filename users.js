@@ -32,20 +32,22 @@ app.use(express.urlencoded( // to support URL-encoded bodies
   extended: true
 }));
 
-creata_admin();
-//load_users();
-//console.log("finish");
+
+load_users();
+
 // API functions
 
 // Version 
 function get_version( req, res) 
 {
 	const version_obj = { version: package.version, description: package.description };
+	res.status( StatusCodes.OK );
 	res.send(  JSON.stringify( version_obj) );   
 }
 
 function list_users( req, res) 
 {
+	res.status( StatusCodes.OK );
 	res.send(  JSON.stringify( g_users) );   //make js object to string
 }
 
@@ -68,6 +70,7 @@ function get_user( req, res )
 		return;
 	}
 
+	res.status( StatusCodes.OK );
 	res.send(  JSON.stringify( user) );   
 }
 
@@ -103,7 +106,8 @@ function delete_user( req, res )
 	const id = get_id_from_token(req, res);
 	if(id == 1 || id== id_to_delete)
 	{
-		g_users.splice( idx, 1 )
+		//g_users.splice( idx, 1 )
+		g_users[id_to_delete].status = "deleted";
 		res.status( StatusCodes.OK ); 
 		res.send(  JSON.stringify( `The user with id: ${id_to_delete} was deleted!`)); 
 	}
@@ -111,7 +115,9 @@ function delete_user( req, res )
 	{
 		res.status( StatusCodes.UNAUTHORIZED );
 		res.send( "You can't delete this user!")
+		return;
 	}
+	save_users();
 	
 }
 
@@ -159,6 +165,7 @@ function create_user( req, res )
 		status: "created"
 	};
 	g_users.push(new_user);
+	res.status( StatusCodes.OK ); 
 	res.send(JSON.stringify(new_user));   
 	save_users();
 }
@@ -247,7 +254,9 @@ function update_user( req, res )
 	// 		}
 	// 	})
 	// } 
+	res.status( StatusCodes.OK ); 
 	res.send(  JSON.stringify( {user}) );  
+	save_users();
 }
 
 function login(req, res)
@@ -279,7 +288,9 @@ function login(req, res)
 		{
 			const token = jwt.sign({email}, token_secret, { expiresIn: '1d' });
 			g_users[user_idx].token = token;
+			res.status( StatusCodes.OK ); 
 			res.send(JSON.stringify(token));
+			save_users();
 		}
 		//user is not active
 		else 
@@ -334,6 +345,7 @@ function approve_user(req, res)
 			user.status = "active";
 			res.status( StatusCodes.OK );
 			res.send( `The user with id: ${id_to_approve} is active!`);
+			save_users();
 		}
 		else
 		{
@@ -372,6 +384,7 @@ function suspend_user(req, res)
 			user.status = "suspended";
 			res.status( StatusCodes.OK );
 			res.send( `The user with id: ${id_to_approve} is suspended!`);
+			save_users();
 		}
 		else
 		{
@@ -409,6 +422,7 @@ function restore_user(req, res)
 			user.status = "active";
 			res.status( StatusCodes.OK );
 			res.send( `The user with id: ${id_to_approve} is active!`);
+			save_users();
 		}
 		else
 		{
@@ -428,6 +442,7 @@ function logout(req, res)
 
 	res.status( StatusCodes.OK );
 	res.send( "You logged out");
+	save_users();
 }
 
 //functions
@@ -541,7 +556,8 @@ async function load_file(file_path)
 {
 	if(! await is_file_exist(file_path))
 	{
-		save_data(file_path, JSON.stringify([]));
+		creata_admin();
+		save_data(file_path, JSON.stringify(g_users));
 	}
 	const data = await fs.readFile(file_path);
 	return data;
