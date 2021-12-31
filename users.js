@@ -1,8 +1,6 @@
-//const utills = require("./utills")
 const express = require('express');
 const StatusCodes = require('http-status-codes').StatusCodes;
 const package = require('./package.json');
-//const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const validator = require("email-validator");
 const md5 = require('md5');
@@ -11,11 +9,11 @@ const fs = require('fs').promises;
 const util = require('util');
 const FILE_PATH = './users.json';
 const token_secret = crypto.randomBytes(64).toString('hex');
-//const readFile = util.promisify(fs.readFile);
 const hash = md5('sudo');
+
 // User's table
 const g_users = [];
-let port =3000
+let port =2718
 const app = express()
 
 // General app settings
@@ -40,84 +38,134 @@ load_users();
 // Version 
 function get_version( req, res) 
 {
-	const version_obj = { version: package.version, description: package.description };
-	res.status( StatusCodes.OK );
-	res.send(  JSON.stringify( version_obj) );   
+	const token = req.header('Authorization');
+	found_token = check_token(token, req, res);
+
+	if(found_token)
+	{
+		const version_obj = { version: package.version, description: package.description };
+		res.status( StatusCodes.OK );
+		res.send(  JSON.stringify( version_obj) );  
+	}
+	else
+	{
+		res.status( StatusCodes.UNAUTHORIZED );
+		res.send( "Only logon user can get this request!");
+	}
+	 
 }
 
 function list_users( req, res) 
 {
-	res.status( StatusCodes.OK );
-	res.send(  JSON.stringify( g_users) );   //make js object to string
+	const token = req.header('Authorization');
+	found_token = check_token(token, req, res);
+
+	if(found_token)
+	{
+		res.status( StatusCodes.OK );
+		res.send(  JSON.stringify( g_users) );   //make js object to string 
+	}
+	else
+	{
+		res.status( StatusCodes.UNAUTHORIZED );
+		res.send( "Only logon user can get this request!");
+	}
+
+	
 }
 
 function get_user( req, res )
 {
 	const id =  parseInt( req.params.id );
+	const token = req.header('Authorization');
+	found_token = check_token(token, req, res);
 
-	if ( id <= 0)
+	if(!found_token)
 	{
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Bad id given")
-		return;
+		res.status( StatusCodes.UNAUTHORIZED );
+		res.send( "Only logon user can get this request!");
 	}
 
-	const user =  g_users.find( user =>  user.id == id )
-	if ( !user)
+	else
 	{
-		res.status( StatusCodes.NOT_FOUND );
-		res.send( "No such user")
-		return;
-	}
+		if ( id <= 0)
+		{
+			res.status( StatusCodes.BAD_REQUEST );
+			res.send( "Bad id given")
+			return;
+		}
 
-	res.status( StatusCodes.OK );
-	res.send(  JSON.stringify( user) );   
+		const user =  g_users.find( user =>  user.id == id )
+		if ( !user)
+		{
+			res.status( StatusCodes.NOT_FOUND );
+			res.send( "No such user")
+			return;
+		}
+
+		res.status( StatusCodes.OK );
+		res.send(  JSON.stringify( user) );  
+	}
+	 
 }
 
 function delete_user( req, res )
 {
 	const id_to_delete =  parseInt( req.params.id );
+
+	const token = req.header('Authorization');
+	found_token = check_token(token, req, res);
 	
-	if ( id_to_delete <= 0)
-	{
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Bad id given")
-		return;
-	}
-
-	//if someone want to delete the admin
-	if ( id_to_delete == 1)
-	{
-		res.status( StatusCodes.FORBIDDEN ); // Forbidden
-		res.send( "Can't delete root user")
-		return;		
-	}
-
-	//check if id exist
-	const idx =  g_users.findIndex( user =>  user.id == id_to_delete )
-	if ( idx < 0 )
-	{
-		res.status( StatusCodes.NOT_FOUND );
-		res.send( "No such user")
-		return;
-	}
-
-	//only admin or curr user can delete
-	const id = get_id_from_token(req, res);
-	if(id == 1 || id== id_to_delete)
-	{
-		//g_users.splice( idx, 1 )
-		g_users[id_to_delete].status = "deleted";
-		res.status( StatusCodes.OK ); 
-		res.send(  JSON.stringify( `The user with id: ${id_to_delete} was deleted!`)); 
-	}
-	else
+	if(!found_token)
 	{
 		res.status( StatusCodes.UNAUTHORIZED );
-		res.send( "You can't delete this user!")
-		return;
+		res.send( "Only logon user can get this request!");
 	}
-	save_users();
+
+	else
+	{
+		if ( id_to_delete <= 0)
+		{
+			res.status( StatusCodes.BAD_REQUEST );
+			res.send( "Bad id given")
+			return;
+		}
+
+		//if someone want to delete the admin
+		if ( id_to_delete == 1)
+		{
+			res.status( StatusCodes.FORBIDDEN ); // Forbidden
+			res.send( "Can't delete root user")
+			return;		
+		}
+
+		//check if id exist
+		const idx =  g_users.findIndex( user =>  user.id == id_to_delete )
+		if ( idx < 0 )
+		{
+			res.status( StatusCodes.NOT_FOUND );
+			res.send( "No such user")
+			return;
+		}
+
+		//only admin or curr user can delete
+		const id = get_id_from_token(req, res);
+		if(id == 1 || id== id_to_delete)
+		{
+			//g_users.splice( idx, 1 )
+			g_users[idx].status = "deleted";
+			res.status( StatusCodes.OK ); 
+			res.send(  JSON.stringify( `The user with id: ${id_to_delete} was deleted!`)); 
+		}
+		else
+		{
+			res.status( StatusCodes.UNAUTHORIZED );
+			res.send( "You can't delete this user!")
+			return;
+		}
+		save_users();
+	}
+	
 	
 }
 
@@ -176,87 +224,76 @@ function create_user( req, res )
 function update_user( req, res )
 {
 	const id =  parseInt( req.params.id );
-	const name = req.body.full_name;
-	const status = req.body.status;
+	const name = req.body.name;
+	//const status = req.body.status;
 	const email = req.body.email;
 	let password = req.body.password;
+
+	const token = req.header('Authorization');
+	found_token = check_token(token, req, res);
  
-	//not valid id
-	if ( !is_id_valid(id, req, res))
+	if(!found_token)
 	{
-		return;
+		res.status( StatusCodes.UNAUTHORIZED );
+		res.send( "Only logon user can get this request!");
 	}
-
-	//there is no such a user with this id
-	if ( !is_id_exist )
-	{
-		return;
-	}
-
-	//name field is empty
-	if (!name)
-	{
-		res.status( StatusCodes.BAD_REQUEST );
-		res.send( "Missing name in request")
-		return;
-	}
-
-	//checking email validation
-	if(!is_email_valid(email, req, res))
-		return;
-		
-	const index = g_users.findIndex(element => element.email==email);
-
-	//there is somone with that email
-	if(index >= 0)
-	{
-		if(!(g_users[index].id == id))                            //check if its the cuurent user or not
+	else
+	{	
+		//check if its the user himeself
+		if(found_token.id != id)
 		{
-			res.status( StatusCodes.BAD_REQUEST );
-			res.send( "This E-mail is already in use")
+			res.status( StatusCodes.UNAUTHORIZED );
+			res.send( "Only the user himself can update his own data");
 			return;
-		}                                
+		}		
+		else
+		{
+			//not valid id
+			if ( !is_id_valid(id, req, res))
+			{
+				return;
+			}
+
+			//there is no such a user with this id
+			if ( !is_id_exist )
+			{
+				return;
+			}
+
+			//name field is empty
+			if (!name)
+			{
+				res.status( StatusCodes.BAD_REQUEST );
+				res.send( "Missing name in request")
+				return;
+			}
+
+			//checking email validation
+			if(!is_email_valid(email, req, res))
+				return;
+				
+			const index = g_users.findIndex(element => element.email==email);
+
+			//there is somone with that email
+			if(index >= 0)
+			{
+				if(!(g_users[index].id == id))                            //check if its the cuurent user or not
+				{
+					res.status( StatusCodes.BAD_REQUEST );
+					res.send( "This E-mail is already in use")
+					return;
+				}                                
+			}
+			found_token.full_name = name;
+			found_token.email = email;
+
+			res.status( StatusCodes.OK ); 
+			res.send(  JSON.stringify( {found_token}) );  
+			save_users();
+		}
 		
 	}
-
-	// if(!check_password(password, req, res))
-	// 	return;
-
-	//const hash = md5(password);
-	user.full_name = name;
-	user.email = email;
-	//user.password = hash;
-
-	// //if the loged-in user is the admin
-	// if (req.tokenData.email === process.env.ADMIN) 
-	// {
-	// 	const user = g_users[idx];
-	// 	user.status = status;
-	// } 
-	// else {
-	// 	if (g_users[idx].status != status)
-	// 	{
-	// 		res.status( StatusCodes.UNAUTHORIZED);
-	// 		res.send( "UNAUTHORIZED user request")
-	// 		return;
-	// 	}
-	// 	bcrypt.hash(req.body.password, 10, (err, hash) => {
-	// 		if (err) {
-	// 			res.status( StatusCodes.INTERNAL_SERVER_ERROR );
-	// 			res.send(err);
-	// 			return;
-	// 		} 
-	// 		else {
-	// 			const user = g_users[idx];
-	// 			user.full_name = name;
-	// 			user.email = email;
-	// 			user.password=hash
-	// 		}
-	// 	})
-	// } 
-	res.status( StatusCodes.OK ); 
-	res.send(  JSON.stringify( {user}) );  
-	save_users();
+	
 }
 
 function login(req, res)
@@ -274,8 +311,8 @@ function login(req, res)
 	{
 		//check if password suitable
 		const hash = md5(password);
-		const user_idx =  g_users.findIndex( item =>  item.password == hash )
-		if(user_idx < 0)
+		const user_idx =  g_users.findIndex( element => element.email==email )
+		if(user.password != hash)
 		{
 			res.status( StatusCodes.Unauthorized );
 			res.send( "The password is incorrect")
@@ -298,13 +335,19 @@ function login(req, res)
 			if(user.status == "suspended")
 			{
 				res.status( StatusCodes.UNAUTHORIZED );
-				res.send( "This user is suspended!")
+				res.send( "Can't log in because you are suspended!")
 				return;
 			}
 			if(user.status == "deleted")
 			{
 				res.status( StatusCodes.UNAUTHORIZED );
-				res.send( "This user is deleted!")
+				res.send( "Can't log in because this user is deleted!")
+				return;
+			}
+			else
+			{
+				res.status( StatusCodes.UNAUTHORIZED );
+				res.send( "Can't log because you were not approved by admin!")
 				return;
 			}
 		}
@@ -452,7 +495,7 @@ function is_email_valid(email, req, res)
 	{
 		if(!validator.validate(email))
 		{
-			res.status( StatusCodes.BAD_REQUEST );
+			res.status( StatusCodes.UNAUTHORIZED );
 			res.send( "Email is not valid in request")
 			return false;
 		}
@@ -470,7 +513,7 @@ function is_email_exist(email, g_users, req, res)
 	const email_found = g_users.find(element => element.email==email);
 	if(email_found)
 		{
-			res.status( StatusCodes.BAD_REQUEST );
+			res.status( StatusCodes.UNAUTHORIZED );
 			res.send( "This E-mail is already in use")
 				return true;
 		}
@@ -481,7 +524,7 @@ function check_password(password,req, res)
 {
 	if(!password || !password.trim())
 	{
-		res.status( StatusCodes.INTERNAL_SERVER_ERROR );
+		res.status( StatusCodes.BAD_REQUEST );
 		res.send("Missing password in request");
 		return false;
 	}
@@ -519,13 +562,6 @@ function check_token(token, req, res)
 		return false;
 	}
 
-	// //check if token identical
-	// if(!(found_token.id == req.body.id))
-	// {
-	// 	res.status( StatusCodes.NOT_FOUND );
-	// 	res.send( "No suitable token")
-	// 	return false;
-	// }
 	return found_token;
 }
 function get_id_from_token(req, res)
@@ -541,8 +577,8 @@ function get_id_from_token(req, res)
 
 function load_users()
 {
-	load_file(FILE_PATH).then((data) => {
-		console.log(data);
+	load_file(FILE_PATH).then((data) => {	
+		//console.log(data);
 		const users = JSON.parse(data);
 		g_users.length = 0;
 		users.forEach (elemnt => {
@@ -563,12 +599,7 @@ async function load_file(file_path)
 	return data;
 }
 
-// const data = await fs.readFile(file_path,  (err, data) => {
-// 	if(err){
-// 		console.log(err);
-// 		return;
-// 	}
-// 	console.log(data)})
+
 
 function creata_admin()
 {
@@ -581,10 +612,7 @@ function creata_admin()
 
 	g_users.push(admin);
 }
-// function save_users()
-// {
-// 	save_data('./try.txt', JSON.stringify(g_users)).catch(err=> console.log(err));
-// }
+
 function save_users()
 {
 	save_data(FILE_PATH, JSON.stringify(g_users)).catch(err=> console.log(err));
@@ -603,7 +631,7 @@ async function is_file_exist(file_path)
 	try{
 		const file_details = await fs.stat(file_path, (err) => {
 			if(err)
-				console.log(err);});
+				console.log(err);});	
 		return true;
 	}
 	catch(e){
