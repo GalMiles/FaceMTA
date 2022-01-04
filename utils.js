@@ -39,20 +39,6 @@ async function save_data(file_path, data)
 	await fs.writeFile(file_path, data)
 }
 
-//check if file doesn't exist do not load
-// async function is_file_exist(file_path)
-// {
-// 	try{
-		
-// 		const file_details = fs.stat(file_path, (err) => {
-// 			if(err)
-// 				console.log(err);});	
-// 		return true;
-// 	}
-// 	catch(e){
-// 		return false;
-// 	}
-// }
 
 module.exports=
 {

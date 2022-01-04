@@ -46,7 +46,6 @@ router.get('/posts', (req, res) => { posts.list_posts(req, res )  } )
 router.post('/posts', (req, res) => { posts.create_post(req, res )  } )
 router.get('/post/(:id)', (req, res) => { posts.get_post(req, res )  })
 router.delete('/post/(:id)', (req, res) => { posts.delete_post(req, res )  })
-//router.delete('/post', () => { posts.load_posts()  })
 
 //-------------MESSAGES-----------
 router.get('/messages', (req, res) => { messages.list_messages(req, res) })
@@ -54,7 +53,6 @@ router.post('/messages', (req, res) => { messages.create_message(req, res) })
 router.post('/messages', (req, res) => { messages.create_message_for_all(req, res) })
 router.get('/messages/(:id)', (req, res) => { messages.get_message(req, res )})
 router.get('/messages/(:id)', (req, res) => { messages.get_chat(req, res ) })
-//router.delete('/messages', () => { messages.load_messages()})
 
 
 

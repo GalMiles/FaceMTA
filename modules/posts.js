@@ -84,11 +84,11 @@ function delete_post( req, res )
     const creator_id=req.body.creator_id;
 	const token = req.header('Authorization');
 	const found_token = utils.check_token(token, req, res);
-	const token_id = get_id_from_token(req, res);
-	if(!found_token || token_id.id !=1) //if not login user or admin
+	const token_id = utils.get_id_from_token(req, res);
+	if(!found_token) //if not login user or admin
 	{
 		res.status( StatusCodes.UNAUTHORIZED );
-		res.send( "Only login of admin user can get this request!");
+		res.send( "Only login user or admin can get this request!");
 	}
 	else
 	{		
