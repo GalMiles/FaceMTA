@@ -13,25 +13,7 @@ const FILE_PATH ="./files/users.json";
 g_users = [];
 
 // --------API FUNCTION--------
-// Version 
-function get_version( req, res) 
-{
-	const token = req.header('Authorization');
-	found_token = utils.check_token(token, req, res);
 
-	if(found_token)
-	{
-		const version_obj = { version: package.version, description: package.description };
-		res.status( StatusCodes.OK );
-		res.send(  JSON.stringify( version_obj) );  
-	}
-	else
-	{
-		res.status( StatusCodes.UNAUTHORIZED );
-		res.send( "Only logon user can get this request!");
-	}
-	 
-}
 
 function create_admin()
 {
@@ -578,7 +560,6 @@ function save_users()
 //function exporting
 module.exports=
 {
-    get_version :get_version,
     list_users: list_users,
     get_user: get_user,
     delete_user: delete_user,

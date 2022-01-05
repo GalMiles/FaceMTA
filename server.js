@@ -3,6 +3,8 @@ const package = require('./package.json');
 const users = require('./modules/users.js');
 const posts = require('./modules/posts.js');
 const messages = require('./modules/messages.js');
+const utils = require('./utils');
+const StatusCodes = require('http-status-codes').StatusCodes;
 
 let port =2718
 const app = express()
@@ -24,11 +26,30 @@ users.load_users();
 posts.load_posts();
 messages.load_messages();
 
+// Version 
+function get_version( req, res) 
+{
+	const token = req.header('Authorization');
+	found_token = utils.check_token(token, req, res);
+
+	if(found_token)
+	{
+		const version_obj = { version: package.version, description: package.description };
+		res.status( StatusCodes.OK );
+		res.send(  JSON.stringify( version_obj) );  
+	}
+	else
+	{
+		res.status( StatusCodes.UNAUTHORIZED );
+		res.send( "Only logon user can get this request!");
+	}
+	 
+}
 
 //============ROUTING==========
 //-------------USERS-----------
 const router = express.Router();
-router.get('/version', (req, res) => { users.get_version(req, res )  } );
+router.get('/version', (req, res) => { get_version(req, res )  } );
 router.get('/users', (req, res) => { users.list_users(req, res )  } )
 router.post('/users', (req, res) => { users.create_user(req, res )  } )
 router.put('/user/(:id)', (req, res) => { users.update_user(req, res )  } )
