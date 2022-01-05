@@ -81,7 +81,7 @@ function create_post( req, res )
 function delete_post( req, res )
 {
 	const id =  parseInt( req.params.id );
-    const creator_id=req.body.creator_id;
+    const creator_id = g_posts.find(item=>item.id==id).creator_id;
 	const token = req.header('Authorization');
 	const found_token = utils.check_token(token, req, res);
 	const token_id = utils.get_id_from_token(req, res);

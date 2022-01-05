@@ -50,9 +50,9 @@ router.delete('/post/(:id)', (req, res) => { posts.delete_post(req, res )  })
 //-------------MESSAGES-----------
 router.get('/messages', (req, res) => { messages.list_messages(req, res) })
 router.post('/messages', (req, res) => { messages.create_message(req, res) })
-router.post('/messages', (req, res) => { messages.create_message_for_all(req, res) })
-router.get('/messages/(:id)', (req, res) => { messages.get_message(req, res )})
-router.get('/messages/(:id)', (req, res) => { messages.get_chat(req, res ) })
+router.post('/messages/forAll', (req, res) => { messages.create_message_for_all(req, res) })
+router.get('/messages/message/(:id)', (req, res) => { messages.get_message(req, res )})
+router.get('/messages/chat/(:id)', (req, res) => { messages.get_chat(req, res ) })
 
 
 

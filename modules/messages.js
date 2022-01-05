@@ -51,6 +51,12 @@ function get_chat(req, res)
 		res.status( StatusCodes.UNAUTHORIZED );
 		res.send( "Only login user can get this request!");
 	}
+	if (!g_messages.find(item=>item.from===sender_id || item.to===sender_id))
+	{
+		res.status( StatusCodes.NOT_FOUND );
+		res.send( "No such chat" )
+		return;
+	}
 	else
 	{
 		res.status( StatusCodes.OK );
@@ -83,12 +89,18 @@ function create_message( req, res )
 			return;
 		}
         //check if 'to' field is not empty
-        if (!to)
+        if (!to )
         {
             res.status( StatusCodes.BAD_REQUEST );
 			res.send("Missing 'to' in request")
 			return;
         }
+		if (!users.get_user_list().find(item=> item.id == to))
+		{
+			res.status( StatusCodes.NOT_FOUND );
+			res.send("User doesn't exist")
+			return;
+		}
 		const new_message=send_message(from, to, text);
 		res.status( StatusCodes.OK ); 
 		res.send(JSON.stringify(new_message)); 
@@ -100,10 +112,7 @@ function create_message( req, res )
 //When admin create one message and send it for all
 function create_message_for_all( req, res )
 {
-    //const token = req.header('Authorization');
-	//const found_token = utils.check_token(token, req, res);
-    const from_id= utils.get_id_from_token(req, res);;
-    //const to = req.body.to;
+    const from_id= utils.get_id_from_token(req, res);
 	const text = req.body.text;
 	const user_list = users.get_user_list();
 	if(from_id != 1) //if not admin
@@ -126,7 +135,7 @@ function create_message_for_all( req, res )
 			res.send("There is no users to send")
 			return;
 		}
-		const new_messages=null;
+		const new_messages=[];
         user_list.forEach(
 			item => { new_messages.push(send_message(from_id, item.id, text)) }
         )
@@ -163,9 +172,9 @@ function get_message( req, res )
 			res.send( "No such message" )
 			return;
 		}
+		res.status( StatusCodes.OK );
+		res.send( JSON.stringify(message) );   
 	}
-	res.status( StatusCodes.OK );
-	res.send( JSON.stringify(message) );   
 }
 
 
