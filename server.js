@@ -28,7 +28,7 @@ messages.load_messages();
 //============ROUTING==========
 //-------------USERS-----------
 const router = express.Router();
-router.get('/version', (req, res) => { get_version(req, res )  } );
+router.get('/version', (req, res) => { users.get_version(req, res )  } );
 router.get('/users', (req, res) => { users.list_users(req, res )  } )
 router.post('/users', (req, res) => { users.create_user(req, res )  } )
 router.put('/user/(:id)', (req, res) => { users.update_user(req, res )  } )
@@ -39,7 +39,7 @@ router.put('/user/approve/(:id)', (req, res) => { users.approve_user(req, res ) 
 router.put('/user/suspend/(:id)', (req, res) => { users.suspend_user(req, res )  })
 router.put('/user/restore/(:id)', (req, res) => { users.restore_user(req, res )  })
 router.post('/user/logout', (req, res) => { users.logout(req, res )  })
-//router.post('/user', () => { users.load_users()  })
+
 
 //-------------POSTS-----------
 router.get('/posts', (req, res) => { posts.list_posts(req, res )  } )

@@ -141,7 +141,7 @@ function delete_user( req, res )
 		}
 
 		//only admin or curr user can delete
-		const id = get_id_from_token(req, res);
+		const id = utils.get_id_from_token(req, res);
 		if(id == 1 || id== id_to_delete)
 		{
 			//g_users.splice( idx, 1 )
@@ -414,7 +414,7 @@ function suspend_user(req, res)
 	}
 
 	//check if admin's token
-	const found_token = utils.heck_token(token, req, res);
+	const found_token = utils.check_token(token, req, res);
 	if(found_token)
 	{
 		if(found_token.id == 1)
