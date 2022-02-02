@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const package = require('./package.json');
 const users = require('./modules/users.js');
 const posts = require('./modules/posts.js');
@@ -9,9 +10,28 @@ const StatusCodes = require('http-status-codes').StatusCodes;
 let port =2718
 const app = express()
 
+const reExt = /\.([a-z]+)/i;
+
+function content_type_from_extension( url)
+{
+	const m = url.match( reExt );
+	if ( !m ) return 'application/json'
+	const ext = m[1].toLowerCase();
+
+	switch( ext )
+	{
+		case 'js': return 'text/javascript';
+		case 'css': return 'text/css';
+		case 'html': return 'text/html';
+	}
+
+	return 'text/plain'
+}
+
 const set_content_type = function (req, res, next) 
 {
-	res.setHeader("Content-Type", "application/json; charset=utf-8");
+	const content_type = req.baseUrl == '/api' ? "application/json; charset=utf-8" : content_type_from_extension( req.url)
+	res.setHeader("Content-Type", content_type);
 	next()
 }
 app.use( set_content_type );
@@ -77,6 +97,7 @@ router.get('/messages/chat/(:id)', (req, res) => { messages.get_chat(req, res ) 
 
 
 
+app.use(express.static(path.join(__dirname, 'client')));
 
 app.use('/api',router)
 
