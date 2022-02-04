@@ -1,12 +1,11 @@
+
+
 class PostItem extends React.Component {
 	constructor(props) {
 		super(props);
 		this.handle_click = this.handle_click.bind(this);
 	}
 
-	handle_click() {
-		if (this.props.handle_delete) this.props.handle_delete(this.props.post.id);
-	}
 
 	render() {
 		return React.createElement(
