@@ -71,6 +71,20 @@ class Register extends React.Component {
         }
 	}
 
+    renderHelper(){
+        return(   
+            <form onSubmit={this.handleSubmit}>
+                <label for="exampleInputName">Full Name</label>
+                <div className="form-group row col-sm-5">
+                    <input type="text" name="name" value={this.state.name} onChange={this.handleChange} className="form-control" id="exampleInputName"  placeholder="Full Name"/>
+                    <label for="exampleInputEmail1">Email</label>
+                    <input type="text" name="email" value={this.state.email} onChange={this.handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email Address"/>
+                    <label for="exampleInputEmail1">Password</label>
+                    <input type="password" name="password" value={this.state.password} onChange={this.handleChange} className="form-control" id="exampleInputPassword1" placeholder="Password"/>
+                </div>
+                <button type="submit" className="btn btn-primary">Register</button>
+            </form>)
+    }
     renderLinks(){
         if(this.state.next_page=="login")
         {
@@ -85,28 +99,8 @@ class Register extends React.Component {
     render() {
         return ( 
         <div>
-            <form onSubmit={this.handleSubmit}>
-            <div className="form-group row">
-                <label for="exampleInputEmail1">Full Name</label>
-                <div className="col-sm-5">
-                <input type="text" name="name" value={this.state.name} onChange={this.handleChange} className="form-control" id="exampleInputEmail1"  placeholder="Full Name"/>
-                </div>
-            </div>
-            <div className="form-group row">
-                <label for="exampleInputEmail1">Email address</label>
-                <div className="col-sm-5">
-                <input type="text" name="email" value={this.state.email} onChange={this.handleChange} className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Email Address"/>
-                </div>
-            </div>
-            <div className="form-group row">
-                <label for="exampleInputPassword1">Password</label>
-                <div className="col-sm-5">
-                <input type="password" name="password" value={this.state.password} onChange={this.handleChange} className="form-control" id="exampleInputPassword1" placeholder="Password"/>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-            </form>
-        {this.renderLinks()}
+            {this.renderHelper()}
+            {this.renderLinks()}
         </div>
         );
       }

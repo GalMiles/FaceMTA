@@ -59,6 +59,39 @@ class Register extends React.Component {
         }
     }
 
+    renderHelper() {
+        return React.createElement(
+            "form",
+            { onSubmit: this.handleSubmit },
+            React.createElement(
+                "label",
+                { "for": "exampleInputName" },
+                "Full Name"
+            ),
+            React.createElement(
+                "div",
+                { className: "form-group row col-sm-5" },
+                React.createElement("input", { type: "text", name: "name", value: this.state.name, onChange: this.handleChange, className: "form-control", id: "exampleInputName", placeholder: "Full Name" }),
+                React.createElement(
+                    "label",
+                    { "for": "exampleInputEmail1" },
+                    "Email"
+                ),
+                React.createElement("input", { type: "text", name: "email", value: this.state.email, onChange: this.handleChange, className: "form-control", id: "exampleInputEmail1", "aria-describedby": "emailHelp", placeholder: "Email Address" }),
+                React.createElement(
+                    "label",
+                    { "for": "exampleInputEmail1" },
+                    "Password"
+                ),
+                React.createElement("input", { type: "password", name: "password", value: this.state.password, onChange: this.handleChange, className: "form-control", id: "exampleInputPassword1", placeholder: "Password" })
+            ),
+            React.createElement(
+                "button",
+                { type: "submit", className: "btn btn-primary" },
+                "Register"
+            )
+        );
+    }
     renderLinks() {
         if (this.state.next_page == "login") {
             return React.createElement("a", { href: "http://localhost:2718/login/index.html" });
@@ -71,57 +104,7 @@ class Register extends React.Component {
         return React.createElement(
             "div",
             null,
-            React.createElement(
-                "form",
-                { onSubmit: this.handleSubmit },
-                React.createElement(
-                    "div",
-                    { className: "form-group row" },
-                    React.createElement(
-                        "label",
-                        { "for": "exampleInputEmail1" },
-                        "Full Name"
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "col-sm-5" },
-                        React.createElement("input", { type: "text", name: "name", value: this.state.name, onChange: this.handleChange, className: "form-control", id: "exampleInputEmail1", placeholder: "Full Name" })
-                    )
-                ),
-                React.createElement(
-                    "div",
-                    { className: "form-group row" },
-                    React.createElement(
-                        "label",
-                        { "for": "exampleInputEmail1" },
-                        "Email address"
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "col-sm-5" },
-                        React.createElement("input", { type: "text", name: "email", value: this.state.email, onChange: this.handleChange, className: "form-control", id: "exampleInputEmail1", "aria-describedby": "emailHelp", placeholder: "Email Address" })
-                    )
-                ),
-                React.createElement(
-                    "div",
-                    { className: "form-group row" },
-                    React.createElement(
-                        "label",
-                        { "for": "exampleInputPassword1" },
-                        "Password"
-                    ),
-                    React.createElement(
-                        "div",
-                        { className: "col-sm-5" },
-                        React.createElement("input", { type: "password", name: "password", value: this.state.password, onChange: this.handleChange, className: "form-control", id: "exampleInputPassword1", placeholder: "Password" })
-                    )
-                ),
-                React.createElement(
-                    "button",
-                    { type: "submit", "class": "btn btn-primary" },
-                    "Register"
-                )
-            ),
+            this.renderHelper(),
             this.renderLinks()
         );
     }

@@ -12,7 +12,8 @@ h1
 button
 {
 	margin-left: 4px;
-	margin-right: 4px;
+	margin-right: 4px;     
+	align-items:center;
 }
 
 .hidden
