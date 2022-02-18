@@ -27,7 +27,7 @@ class NavBar extends React.Component {
                     React.createElement(
                         "a",
                         { href: "#", onClick: this.handle_click, name: "manage_requests" },
-                        React.createElement("i", { className: "fa fa-check" }),
+                        React.createElement("i", { className: "fa fa-tasks" }),
                         " Manage"
                     )
                 )
@@ -84,7 +84,7 @@ class NavBar extends React.Component {
                             React.createElement(
                                 "a",
                                 { href: "#", onClick: this.handle_click, name: "logout" },
-                                React.createElement("i", { className: "fa fa-key" }),
+                                React.createElement("i", { className: "fa fa-sign-out" }),
                                 " Logout"
                             )
                         ),

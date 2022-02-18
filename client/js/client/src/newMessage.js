@@ -1,3 +1,5 @@
+import MessageToAll from './messageToAll.js';
+
 class NewMessage extends React.Component {
     constructor(props) {
         super(props);
@@ -12,6 +14,11 @@ class NewMessage extends React.Component {
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
+    }
+
+    reset_values() {
+        this.setState({ to: "" });
+        this.setState({ text: " " });
     }
 
     async handle_submit(event) {
@@ -30,10 +37,17 @@ class NewMessage extends React.Component {
         });
         if (response.status == 200) {
             this.props.update_curr_page("messages");
-            // window.location.reload(false);
+            this.reset_values();
+            this.props.fetch_messages();
         } else {
             const err = await response.text();
             alert(err);
+        }
+    }
+
+    admin_menu() {
+        if (this.props.is_admin) {
+            return React.createElement(MessageToAll, { is_admin: this.props.is_admin, text: this.state.text, cookie: this.props.cookie });
         }
     }
 
@@ -52,9 +66,9 @@ class NewMessage extends React.Component {
                     "button",
                     { type: "submit", className: "btn" },
                     "Send"
-                ),
-                React.createElement("br", null)
-            )
+                )
+            ),
+            this.admin_menu()
         );
     }
 }

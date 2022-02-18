@@ -21,7 +21,7 @@ class NavBar extends React.Component {
         if ( this.props.is_admin ) {
             return (
                 <React.Fragment>
-                    <li><a href="#" onClick={this.handle_click} name="manage_requests"><i className="fa fa-check"></i> Manage</a></li>
+                    <li><a href="#" onClick={this.handle_click} name="manage_requests"><i className="fa fa-tasks"></i> Manage</a></li>
                 </React.Fragment>
             );
         }
@@ -36,7 +36,7 @@ class NavBar extends React.Component {
                             <li><a href="#" onClick={this.handle_click} name="posts"><i className="fa fa-home"></i> Home</a></li>
                             <li><a href="#" onClick={this.handle_click} name="messages"><i className="fa fa-envelope"></i> Messages</a></li>
                             <li><a href="#" onClick={this.handle_click} name="about"><i className="fa fa-user-o"></i> About</a></li>
-                            <li><a href="#" onClick={this.handle_click} name="logout"><i className="fa fa-key"></i> Logout</a></li>
+                            <li><a href="#" onClick={this.handle_click} name="logout"><i className="fa fa-sign-out"></i> Logout</a></li>
                             {this.admin_menu()}
 
                         </ul>

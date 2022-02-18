@@ -1,3 +1,5 @@
+import MessageToAll from './messageToAll.js';
+
 class NewMessage extends React.Component {
     constructor(props) {
         super(props);
@@ -9,11 +11,19 @@ class NewMessage extends React.Component {
         this.handle_submit = this.handle_submit.bind(this);
         this.handleChange = this.handleChange.bind(this);
 
+
     }
 
 
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
+    }
+
+    reset_values()
+    {
+        this.setState( {to: ""});
+        this.setState( {text: " "});
+
     }
 
     async handle_submit(event) {
@@ -32,13 +42,20 @@ class NewMessage extends React.Component {
         });
         if (response.status == 200) {
             this.props.update_curr_page("messages");
-            // window.location.reload(false);
+            this.reset_values();
+            this.props.fetch_messages();
         }
         else {
             const err = await response.text();
             alert(err);
         }
 
+    }
+
+    admin_menu() {
+        if ( this.props.is_admin ) {
+            return (<MessageToAll is_admin={this.props.is_admin} text={this.state.text} cookie={this.props.cookie}/>)
+        }
     }
 
     render() {
@@ -50,9 +67,9 @@ class NewMessage extends React.Component {
                     <textarea onChange={this.handleChange} className="text"name="text" placeholder="Write a new message" value={this.state.text}></textarea>
                     <br></br>
                     <button type="submit" className="btn">Send</button>
-                    <br></br>
-
                 </form>
+                {this.admin_menu()}
+
             </div>
         );
     }

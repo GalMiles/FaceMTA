@@ -87,7 +87,7 @@ class App extends React.Component {
                 return React.createElement(
                     'div',
                     { className: 'Messages' },
-                    React.createElement(Messages, { cookie: this.state.cookie })
+                    React.createElement(Messages, { cookie: this.state.cookie, update_curr_page: this.update_curr_page, is_admin: this.state.is_admin })
                 );
             case 'about':
                 return React.createElement(About, null);

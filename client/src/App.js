@@ -95,7 +95,7 @@ class App extends React.Component {
         switch (this.state.curr_page) {
             case 'messages': return (
                 <div className='Messages'>
-                    <Messages cookie={this.state.cookie} update_curr_page={this.update_curr_page}/>
+                    <Messages cookie={this.state.cookie} update_curr_page={this.update_curr_page} is_admin={this.state.is_admin}/>
                 </div>);
             case 'about': return <About />;
             case 'manage_requests': return <Users cookie={this.state.cookie}/>;

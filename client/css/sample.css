@@ -155,6 +155,19 @@ button
 	left: 180px;
   }
   
+.AdminButton
+{
+	background-color: #4CAF50; /* Green */
+	border: none;
+	color: white;
+	padding: 8px 15px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	position: relative;
+	left:140px;
+}
 
   nav{
 	width: 80%;
