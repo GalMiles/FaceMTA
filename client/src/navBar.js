@@ -21,7 +21,7 @@ class NavBar extends React.Component {
         if ( this.props.is_admin ) {
             return (
                 <React.Fragment>
-                    <li><a href="#" onClick={this.handle_click} name="requests"><i className="fa fa-check"></i> Requests</a></li>
+                    <li><a href="#" onClick={this.handle_click} name="manage_requests"><i className="fa fa-check"></i> Manage</a></li>
                 </React.Fragment>
             );
         }
