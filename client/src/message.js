@@ -10,7 +10,7 @@ class Message extends React.Component {
             <div className='Message'>
                 <div>
                     <p>{this.props.message.creation_time}</p>
-                    <p>From:{this.props.message.from}</p>
+                    <p>To:{this.props.message.to}</p>
                     <p>{this.props.message.text}</p>
                 </div>
                 <br></br>

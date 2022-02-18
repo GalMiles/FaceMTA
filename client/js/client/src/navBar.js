@@ -26,9 +26,9 @@ class NavBar extends React.Component {
                     null,
                     React.createElement(
                         "a",
-                        { href: "#", onClick: this.handle_click, name: "requests" },
+                        { href: "#", onClick: this.handle_click, name: "manage_requests" },
                         React.createElement("i", { className: "fa fa-check" }),
-                        " Requests"
+                        " Manage"
                     )
                 )
             );

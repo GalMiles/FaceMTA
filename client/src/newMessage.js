@@ -31,8 +31,8 @@ class NewMessage extends React.Component {
             })
         });
         if (response.status == 200) {
-            const messages = await response.json();
-            window.location.reload(false);
+            this.props.update_curr_page("messages");
+            // window.location.reload(false);
         }
         else {
             const err = await response.text();

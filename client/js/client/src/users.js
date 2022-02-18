@@ -1,8 +1,6 @@
 class Users extends React.Component {
     constructor(props) {
         super(props);
-       
-      
     }
 
     // async componentDidMount() {
@@ -40,9 +38,7 @@ class Users extends React.Component {
     // }
 
     render() {
-        return (
-          null
-        );
+        return null;
     }
 }
 

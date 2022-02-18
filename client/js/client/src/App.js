@@ -2,7 +2,7 @@ import Posts from './posts.js';
 import NewPost from './newPost.js';
 import NavBar from './navBar.js';
 import About from './about.js';
-import ApproveUsers from './approveUsers.js';
+import Users from './Users.js';
 import Messages from './messages.js';
 import Logout from './logout.js';
 
@@ -91,8 +91,8 @@ class App extends React.Component {
                 );
             case 'about':
                 return React.createElement(About, null);
-            case 'requests':
-                return React.createElement(ApproveUsers, { cookie: this.state.cookie });
+            case 'manage_requests':
+                return React.createElement(Users, { cookie: this.state.cookie });
             case 'logout':
                 return React.createElement(Logout, { cookie: this.state.cookie });
             case 'posts':

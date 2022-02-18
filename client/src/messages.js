@@ -56,7 +56,7 @@ class Messages extends React.Component {
         return (
             <div>
                 <div className='NewMessage'>
-                    <NewMessage cookie={this.props.cookie} update_list={this.update_list} />
+                    <NewMessage cookie={this.props.cookie} update_list={this.update_list} update_curr_page={this.props.update_curr_page} />
                 </div>
                 <div>
                     {this.state.messages.map((item, index) => { return <Message message={item} key={index} /> })}

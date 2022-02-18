@@ -53,7 +53,7 @@ class Messages extends React.Component {
             React.createElement(
                 'div',
                 { className: 'NewMessage' },
-                React.createElement(NewMessage, { cookie: this.props.cookie, update_list: this.update_list })
+                React.createElement(NewMessage, { cookie: this.props.cookie, update_list: this.update_list, update_curr_page: this.props.update_curr_page })
             ),
             React.createElement(
                 'div',

@@ -18,8 +18,8 @@ class Message extends React.Component {
                 React.createElement(
                     'p',
                     null,
-                    'From:',
-                    this.props.message.from
+                    'To:',
+                    this.props.message.to
                 ),
                 React.createElement(
                     'p',
