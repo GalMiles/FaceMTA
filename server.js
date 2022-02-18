@@ -10,31 +10,38 @@ const StatusCodes = require('http-status-codes').StatusCodes;
 let port =2718
 const app = express()
 
-const reExt = /\.([a-z]+)/i;
+function get_content_type_from_ext(url) {
+	const match = url.match( /\.([a-z]+)/i );
+	
+	if ( ! match ) {
+		if ( url === '/' || match == null ) {
+			return 'text/html';
+		}
 
-function content_type_from_extension( url)
-{
-	const m = url.match( reExt );
-	if ( !m ) return 'application/json'
-	const ext = m[1].toLowerCase();
-
-	switch( ext )
-	{
-		case 'js': return 'text/javascript';
-		case 'css': return 'text/css';
-		case 'html': return 'text/html';
+		return 'application/json';
 	}
 
-	return 'text/plain'
+	const ext = match[1].toLowerCase();
+
+	switch( ext ) {
+		case 'js': 
+			return 'text/javascript';
+		case 'css': 
+			return 'text/css';
+		case 'html': 
+			return 'text/html';
+	}
+
+	return 'text/plain';
 }
 
-const set_content_type = function (req, res, next) 
-{
-	const content_type = req.baseUrl == '/api' ? "application/json; charset=utf-8" : content_type_from_extension( req.url)
-	res.setHeader("Content-Type", content_type);
-	next()
-}
-app.use( set_content_type );
+// General app settings
+app.use((req, res, next) => {
+	const content_type = '/api' === req.baseUrl ? 'application/json; charset=utf-8' : get_content_type_from_ext(req.url);
+	res.contentType(content_type);
+	next();
+});
+
 app.use(express.json());  // to support JSON-encoded bodies
 app.use(express.urlencoded( // to support URL-encoded bodies
 {  

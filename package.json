@@ -3,7 +3,9 @@
     "version": "0.0.001",
     "description": "JavaScript Course API Sample",
     "main": "server.js",
-    "scripts": {},
+    "scripts": {
+        "build": "npx babel --presets react client/src/*.js --out-dir client/js"
+    },
     "license": "TBD",
     "dependencies": {
         "babel": "^6.23.0",

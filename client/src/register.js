@@ -6,7 +6,6 @@ class Register extends React.Component {
           name: "",
           email: "",
           password: "",
-          next_page:""
     };
   
       this.handleChange = this.handleChange.bind(this);
@@ -14,25 +13,21 @@ class Register extends React.Component {
     }
 
     handleChange(event) {
-        if(event.target.name == "email")
-        {
-             this.setState({email: event.target.value})
-        }
-        else if(event.target.name == "password")
-        {
-            this.setState({password: event.target.value})             
-        }
-        else
-            this.setState({name: event.target.value})
+        this.setState({ [event.target.name]: event.target.value });
       }
   
     async handleSubmit(event) {
+        event.preventDefault();
       await this.handle_register();
     }
 
     async fetch_users()
 	{
-		const response = await fetch('/api/users');
+		const response = await fetch('/api/users' , {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }});
 		if ( response.status != 200 )
 		  throw new Error( 'Error while fetching users');
 		const data = await response.json();
@@ -59,14 +54,13 @@ class Register extends React.Component {
         });
         if ( response.status == 200 )
             {
-                const users = await response.fetch_users();	
+                const users = await response.json();	
                 this.update_list(users); 
-                this.state.next_page = "login"
+                window.location = '../login/index.html';
             }
         else 
         {
             const err = await response.text();
-            this.state.next_page="register"
             alert( err );
         }
 	}
@@ -88,11 +82,11 @@ class Register extends React.Component {
     renderLinks(){
         if(this.state.next_page=="login")
         {
-            return <a href="http://localhost:2718/login/index.html"></a>
+            return <a href="http://localhost:2718/login/index.html">Login</a>
         }
         else
         {
-            return <a href="http://localhost:2718/register/index.html"></a>
+            return <a href="http://localhost:2718/register/index.html">Register</a>
         }
     }
    

@@ -294,7 +294,7 @@ function login(req, res)
 		//the password is suitable to email
 		if(user.status == "active")
 		{
-			const token = jwt.sign({email}, token_secret, { expiresIn: '1d' });
+			const token = jwt.sign({email}, token_secret, { expiresIn: '10m' });
 			g_users[user_idx].token = token;
 			res.status( StatusCodes.OK ); 
 			res.send(JSON.stringify(token));
@@ -467,6 +467,7 @@ function logout(req, res)
 	const user = utils.check_token(token, req, res);
 	user.token = null;
 
+	// res.Cookies.Clear();
 	res.status( StatusCodes.OK );
 	res.send( "You logged out");
 	save_users();

@@ -18,7 +18,8 @@ class Login extends React.Component {
   }
 
   async handleSubmit(event) {
-    await this.handle_login();
+    event.preventDefault();
+    const res = await this.handle_login();
   }
 
   //login method
@@ -36,6 +37,7 @@ class Login extends React.Component {
     if (response.status == 200) {
       const json = await response.json();
       this.set_cookie(this.state.email, json);
+      window.location = '../home/index.html';
     } else {
       const err = await response.text();
       alert(err);
@@ -46,6 +48,11 @@ class Login extends React.Component {
   set_cookie(name, value) {
     document.cookie = name + "=" + value + ";path=/";
   }
+
+  // set_cookie(token) {
+  //   document.cookie = token;
+  // }
+
 
   get_cookie(name) {
     const value = `; ${document.cookie}`;
@@ -63,7 +70,7 @@ class Login extends React.Component {
         { className: "form-group row" },
         React.createElement(
           "label",
-          { "for": "exampleInputEmail1" },
+          { htmlFor: "exampleInputEmail1" },
           "Email address"
         ),
         React.createElement(
@@ -77,7 +84,7 @@ class Login extends React.Component {
         { className: "form-group row" },
         React.createElement(
           "label",
-          { "for": "exampleInputPassword1" },
+          { htmlFor: "exampleInputPassword1" },
           "Password"
         ),
         React.createElement(
@@ -88,7 +95,7 @@ class Login extends React.Component {
       ),
       React.createElement(
         "button",
-        { type: "submit", "class": "btn btn-primary" },
+        { type: "submit", className: "btn btn-primary" },
         "Login"
       )
     );
