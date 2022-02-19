@@ -54,7 +54,7 @@ class NewMessage extends React.Component {
 
     admin_menu() {
         if ( this.props.is_admin ) {
-            return (<MessageToAll is_admin={this.props.is_admin} text={this.state.text} cookie={this.props.cookie}/>)
+            return (<MessageToAll is_admin={this.props.is_admin} text={this.state.text} cookie={this.props.cookie} fetch_messages={this.props.fetch_messages}/>)
         }
     }
 

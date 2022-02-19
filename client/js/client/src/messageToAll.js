@@ -26,7 +26,10 @@ class MessageToAll extends React.Component {
             })
         });
 
-        if (response.status != 200) {
+        if (response.status == 200) {
+            this.reset_values();
+            this.props.fetch_messages();
+        } else {
             const err = await response.text();
             alert(err);
         }
