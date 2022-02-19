@@ -68,6 +68,7 @@ class NewMessage extends React.Component {
                     <br></br>
                     <button type="submit" className="btn">Send</button>
                 </form>
+                <br></br>
                 {this.admin_menu()}
 
             </div>

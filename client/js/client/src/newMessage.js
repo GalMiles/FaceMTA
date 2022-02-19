@@ -68,6 +68,7 @@ class NewMessage extends React.Component {
                     "Send"
                 )
             ),
+            React.createElement("br", null),
             this.admin_menu()
         );
     }
