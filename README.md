@@ -19,7 +19,6 @@ Based on One-Page programming technique.
 * Async functions
 * npm crypto - https://www.npmjs.com/package/crypto-js
 * npm jsonwebtoken - https://www.npmjs.com/package/jsonwebtoken
-* Client side - React
 
 ### Frontend
 * React.js
