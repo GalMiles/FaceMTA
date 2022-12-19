@@ -16,8 +16,8 @@ User can register and log-in into the platform. Also can write posts and message
 ### Backend
 * Node.js + Express
 * Async functions
-* npm crypto - https://www.npmjs.com/package/crypto-js
-* npm jsonwebtoken - https://www.npmjs.com/package/jsonwebtoken
+* [npm crypto](https://www.npmjs.com/package/crypto-js)
+* [npm jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 
 ### Frontend
 * React.js
