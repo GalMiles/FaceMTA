@@ -2,7 +2,7 @@
 <!-- PROJECT LOGO -->
 ## FaceMTA - Social Network Web Application
 A social network web application which manages users, posts and messages.
-Users can register and log-in into the platform. Also can write posts and messages to other users.
+User can register and log-in into the platform. Also can write posts and messages to other users.
 <br></br>
 Server side is based on API http requests.
 Client side is based on React's components.
