@@ -4,7 +4,7 @@
 A social network web application which manages users, posts and messages.
 User can register and log-in into the platform. Also can write posts and messages to other users.
 <br></br>
-Server side is based on API http requests.
+Server side is based on http requests API.
 Client side is based on React's components.
 Based on One-Page programming technique.
 
